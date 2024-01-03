@@ -3,21 +3,15 @@
 #include "../include/socket.h"
 #include "../include/inetaddress.h"
 #include "../include/channel.h"
+#include "../include/acceptor.h"
 #include <functional>
 #include <string.h>
 #include <unistd.h>
 
 Server::Server(EventLoop* loop) : m_loop(loop) {
-    Socket *serv_sock = new Socket();
-    InetAddress *serv_addr = new InetAddress("127.0.0.1", 8888);
-    serv_sock->bind(serv_addr);
-    serv_sock->listen();
-    serv_sock->setNoBlocking();
-
-    Channel *serv_channel = new Channel(m_loop, serv_sock->getFd());
-    std::function<void()> cv = std::bind(&Server::newConnection, this, serv_sock);
-    serv_channel->setCallBack(cv);
-    serv_channel->enableReading();
+    m_acceptor = new Acceptor(loop);
+    std::function<void(Socket*)> cb = std::bind(&Server::newConnection, this, std::placeholders::_1);
+    m_acceptor->setNewConnectionCallback(cb);
 }
 
 Server::~Server() {

@@ -3,6 +3,7 @@
 
 class EventLoop;
 class Socket;
+class Acceptor;
 
 class Server{
 public:
@@ -13,6 +14,7 @@ public:
     void newConnection(Socket *serv_sock);
 private:
     EventLoop *m_loop;
+    Acceptor *m_acceptor;
 };
 
 #endif
